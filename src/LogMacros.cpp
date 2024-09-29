@@ -1,14 +1,6 @@
 
 #include "LogMacros.h"
 
-
-
-// Helper function to calculate how many spaces are needed for tab alignment
-int calculateTabSpaces(int currentLength) {
-	int nextTabStop = ((currentLength / TAB_SIZE) + 1) * TAB_SIZE;
-	return nextTabStop - currentLength;
-}
-
 // Function to split a single string into a vector of strings of fixed size (availableSpace)
 std::vector<std::string> wrapMessage(const std::string& message, int availableSpace) {
 	std::vector<std::string> lines;

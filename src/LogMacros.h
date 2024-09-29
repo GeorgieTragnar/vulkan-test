@@ -10,6 +10,8 @@
 #include <sstream>  // for std::stringstream
 #include <vector>
 #include <thread>   // for std::this_thread::get_id
+#include <mutex>
+#include <map>
 
 // ANSI color codes
 #define RESET         "\033[0m"
@@ -40,6 +42,75 @@
 // Max length of a log line before wrapping
 const int LOG_LINE_LENGTH = 232; // You can adjust this value
 const int TAB_SIZE = 4;
+
+// Log levels in increasing order
+enum class LogLevel {
+    TRACE = 0,
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR,
+    CRITICAL
+};
+
+// Function to convert LogLevel to string for display
+inline const char* logLevelToString(LogLevel level) {
+    switch (level) {
+        case LogLevel::TRACE:    return "TRACE";
+        case LogLevel::DEBUG:    return "DEBUG";
+        case LogLevel::INFO:     return "INFO ";
+        case LogLevel::WARNING:  return "WARN ";
+        case LogLevel::ERROR:    return "ERROR";
+        case LogLevel::CRITICAL: return "CRIT ";
+        default:                 return "";
+    }
+}
+
+// GroupLogger class to manage log levels for different groups
+class PrettyLogger {
+public:
+
+    // Global instance of GroupLogger
+    inline static PrettyLogger& Instance() {
+        static PrettyLogger instance;
+        return instance;
+    }
+
+    // Set the log level for a specific group
+    void setGroupLogLevel(const std::string& group, LogLevel level) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        groupLogLevels_[group] = level;
+    }
+
+    // Get the current log level for a specific group
+    LogLevel getGroupLogLevel(const std::string& group) const {
+        std::lock_guard<std::mutex> lock(mutex_);
+        auto it = groupLogLevels_.find(group);
+        return it != groupLogLevels_.end() ? it->second : defaultLogLevel_;
+    }
+
+    // Set the default log level (if no specific group level is set)
+    void setDefaultLogLevel(LogLevel level) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        defaultLogLevel_ = level;
+    }
+
+    // Check if a message should be logged for the specified group and level
+    bool shouldLog(const std::string& group, LogLevel level) const {
+        return level >= getGroupLogLevel(group);
+    }
+
+private:
+    mutable std::mutex mutex_;
+    LogLevel defaultLogLevel_ = LogLevel::TRACE;  // Default log level if none is set
+    std::map<std::string, LogLevel> groupLogLevels_;
+};
+
+// Helper function to calculate how many spaces are needed for tab alignment
+inline int calculateTabSpaces(int currentLength) {
+	int nextTabStop = ((currentLength / TAB_SIZE) + 1) * TAB_SIZE;
+	return nextTabStop - currentLength;
+}
 
 // Function to deduce the format specifier based on the argument type
 template <typename T>
@@ -138,24 +209,30 @@ inline std::string getThreadId() {
 // Base logging macro with file name and line number at the end, supporting printf-style formatting and colors
 #define LOG_COLOR(level, color, bgColor, format, ...) \
 	do { \
-		std::string subFormat = substituteFormatSpecifiers(format, ##__VA_ARGS__); \
-		std::string formattedMsg = formatString(subFormat.c_str(), ##__VA_ARGS__); \
-		std::string fileInfo = getFileName(__FILE__) + ":" + std::to_string(__LINE__); \
-		std::string dateTime = currentDateTime(); \
-		int metadataLength = 27 + fileInfo.size() + 1;  /* timestamp + " | " + thread_id (max 19 chars) + " | " + log level + " | " */ \
-		int availableSpace = LOG_LINE_LENGTH - metadataLength; \
-		std::vector<std::string> wrappedLines = wrapMessage(formattedMsg, availableSpace); \
-		std::cout << color << bgColor << dateTime << "|" << getThreadId() << "|" \
-			<< level << "| " << wrappedLines[0] << " " << fileInfo; \
-		for (size_t i = 1; i < wrappedLines.size(); ++i) { \
-			std::cout << "\n" << std::string(27 + 1, ' ') << wrappedLines[i]; \
-		} \
-		std::cout << RESET << std::endl; \
+        if (PrettyLogger::Instance().shouldLog(LOG_GROUP, level)) { \
+            std::string subFormat = substituteFormatSpecifiers(format, ##__VA_ARGS__); \
+            std::string formattedMsg = formatString(subFormat.c_str(), ##__VA_ARGS__); \
+            std::string fileInfo = getFileName(__FILE__) + ":" + std::to_string(__LINE__); \
+            std::string dateTime = currentDateTime(); \
+            int metadataLength = 27 + fileInfo.size() + 1;  /* timestamp + " | " + thread_id (max 19 chars) + " | " + log level + " | " */ \
+            int availableSpace = LOG_LINE_LENGTH - metadataLength; \
+            std::vector<std::string> wrappedLines = wrapMessage(formattedMsg, availableSpace); \
+            std::cout << color << bgColor << dateTime << "|" << getThreadId() << "|" \
+                << logLevelToString(level) << "| " << wrappedLines[0] << " " << fileInfo; \
+            for (size_t i = 1; i < wrappedLines.size(); ++i) { \
+                std::cout << "\n" << std::string(27 + 1, ' ') << wrappedLines[i]; \
+            } \
+            std::cout << RESET << std::endl; \
+        } \
 	} while (0)
 
-#define LOG_TRACE(format, ...) LOG_COLOR("TRACE", DIM_WHITE, BG_BLACK, format, ##__VA_ARGS__)
-#define LOG_INFO(format, ...) LOG_COLOR("INFO ", GREEN, BG_BLACK, format, ##__VA_ARGS__)
-#define LOG_DEBUG(format, ...) LOG_COLOR("DEBUG", CYAN, BG_BLACK, format, ##__VA_ARGS__)
-#define LOG_WARNING(format, ...) LOG_COLOR("WARN ", BOLD_YELLOW, BG_BLACK, format, ##__VA_ARGS__)
-#define LOG_ERROR(format, ...) LOG_COLOR("ERROR", BOLD_RED, BG_BLACK, format, ##__VA_ARGS__)
-#define LOG_CRITICAL(format, ...) LOG_COLOR("CRIT ", BOLD_WHITE, BG_RED, format, ##__VA_ARGS__)
+#define LOG_TRACE(format, ...) LOG_COLOR(LogLevel::TRACE, DIM_WHITE, BG_BLACK, format, ##__VA_ARGS__)
+#define LOG_INFO(format, ...) LOG_COLOR(LogLevel::INFO, GREEN, BG_BLACK, format, ##__VA_ARGS__)
+#define LOG_DEBUG(format, ...) LOG_COLOR(LogLevel::DEBUG, CYAN, BG_BLACK, format, ##__VA_ARGS__)
+#define LOG_WARNING(format, ...) LOG_COLOR(LogLevel::WARNING, BOLD_YELLOW, BG_BLACK, format, ##__VA_ARGS__)
+#define LOG_ERROR(format, ...) LOG_COLOR(LogLevel::ERROR, BOLD_RED, BG_BLACK, format, ##__VA_ARGS__)
+#define LOG_CRITICAL(format, ...) LOG_COLOR(LogLevel::CRITICAL, BOLD_WHITE, BG_RED, format, ##__VA_ARGS__)
+
+#ifdef LOG_GROUP
+    #undef LOG_GROUP
+#endif

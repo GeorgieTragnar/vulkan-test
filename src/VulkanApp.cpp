@@ -1,12 +1,18 @@
 
 #include "VulkanApp.h"
 
+#include "LogMacros.h"
+#ifdef LOG_GROUP
+	#undef LOG_GROUP 
+#endif
+#define LOG_GROUP LOG_GROUP_VULKAN
+
 VulkanApp::VulkanApp()
 : _enableValidationLayers(
 #ifdef NDEBUG
-    false
+	false
 #else
-    true
+	true
 #endif
 )
 {
@@ -22,6 +28,32 @@ VulkanApp::~VulkanApp()
 	}
 	vkDestroyInstance(_instance, nullptr);
 
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+	VkDebugUtilsMessageTypeFlagsEXT messageType,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData) 
+{
+	if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+		LOG_INFO("validationlayer: {}", pCallbackData->pMessage);
+	else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+		LOG_INFO("validationlayer: {}", pCallbackData->pMessage);
+	else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+		LOG_WARNING("validationlayer: {}", pCallbackData->pMessage);
+	else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+		LOG_ERROR("validationlayer: {}", pCallbackData->pMessage);
+	else
+		LOG_CRITICAL("unknown type bit: {}\nvalidationlayer: {}", int(messageSeverity), pCallbackData->pMessage);
+		
+
+	// TODO: messageType contains debug data info 
+
+	// LOG_ERROR("validationlayer: {}", pCallbackData->pMessage);
+	// std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+
+	return VK_FALSE;
 }
 
 void VulkanApp::createInstance()
@@ -42,7 +74,7 @@ void VulkanApp::createInstance()
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
-    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 	if (_enableValidationLayers)
 	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
@@ -71,17 +103,17 @@ void VulkanApp::createInstance()
 }
 
 std::vector<const char*> VulkanApp::getRequiredExtensions() {
-    uint32_t glfwExtensionCount = 0;
-    const char** glfwExtensions;
-    glfwExtensions = Window::Instance().getRequiredInstanceExtensions(glfwExtensionCount);
+	uint32_t glfwExtensionCount = 0;
+	const char** glfwExtensions;
+	glfwExtensions = Window::Instance().getRequiredInstanceExtensions(glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
-    if (_enableValidationLayers) {
-        extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
+	if (_enableValidationLayers) {
+		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
 
-    return extensions;
+	return extensions;
 }
 
 void VulkanApp::setupDebugMessenger()

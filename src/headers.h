@@ -9,4 +9,6 @@
 #include <assert.h>
 #include <cstring>
 
-#include "LogMacros.h"
+#define LOG_GROUP_DEFAULT "LogGroupDefault"
+#define LOG_GROUP_VULKAN "LogGroupVulkan"
+#define LOG_GROUP_GLFW "LogGroupGLFW"
