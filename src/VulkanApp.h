@@ -2,6 +2,7 @@
 #pragma once
 
 #include "headers.h"
+#include "Window.h"
 
 class VulkanApp
 {
@@ -19,5 +20,11 @@ protected:
 	VulkanApp();
 	~VulkanApp();
 
+	void createInstance();
+	void checkExtensions();
+
+
+
+	VkInstance _instance = nullptr;
 
 };

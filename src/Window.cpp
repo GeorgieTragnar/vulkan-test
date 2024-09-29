@@ -26,3 +26,8 @@ bool Window::loopStep()
 	glfwPollEvents();
 	return true;
 }
+
+const char** Window::getRequiredInstanceExtensions(uint32_t& count)
+{
+	return glfwGetRequiredInstanceExtensions(&count);
+}

@@ -14,6 +14,8 @@ public:
 
 	bool loopStep();
 
+	const char** getRequiredInstanceExtensions(uint32_t& count);
+
 protected:
 
 	Window();
