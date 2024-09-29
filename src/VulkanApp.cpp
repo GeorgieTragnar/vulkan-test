@@ -47,11 +47,9 @@ void VulkanApp::checkExtensions()
 	std::vector<VkExtensionProperties> extensions(extensionCount);
 	
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-	// std::cout << "available extensions:\n";
 	LOG_INFO("available extensions");
 
 	for (const auto& extension : extensions) {
-		LOG_INFO("\t%s", extension.extensionName);
-		// std::cout << '\t' << extension.extensionName << '\n';
+		LOG_INFO("{}", extension.extensionName);
 	}
 }

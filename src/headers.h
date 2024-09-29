@@ -6,5 +6,6 @@
 
 #include <stdexcept>
 #include <vector>
+#include <assert.h>
 
 #include "LogMacros.h"
