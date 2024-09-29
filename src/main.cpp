@@ -14,7 +14,8 @@ int main()
 	try {
 		app.run();
 	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
+		LOG_CRITICAL("exception: {}", e.what());
+		// std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 

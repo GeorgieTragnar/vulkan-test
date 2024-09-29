@@ -7,5 +7,6 @@
 #include <stdexcept>
 #include <vector>
 #include <assert.h>
+#include <cstring>
 
 #include "LogMacros.h"
