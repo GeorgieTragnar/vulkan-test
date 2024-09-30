@@ -29,6 +29,7 @@ protected:
 	void destroyDebugUtilsMessengerEXT();
 
 	void checkExtensions();
+	void pickPhysicalDevice();
 
 
 	const bool _enableValidationLayers;
@@ -38,6 +39,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
 	VkInstance _instance = nullptr;
 
 };

@@ -19,6 +19,7 @@ VulkanApp::VulkanApp()
 	createInstance();
 	setupDebugMessenger();
 	checkExtensions();
+	pickPhysicalDevice();
 }
 
 VulkanApp::~VulkanApp()
@@ -187,5 +188,42 @@ void VulkanApp::checkExtensions()
 
 	for (const auto& extension : extensions) {
 		LOG_INFO("{}", extension.extensionName);
+	}
+}
+
+void VulkanApp::pickPhysicalDevice()
+{
+	uint32_t deviceCount = 0;
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
+
+	if (deviceCount == 0) 
+	{
+		throw std::runtime_error("failed to find GPUs with Vulkan support!");
+	}
+
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
+
+	for (const auto& device : devices) {
+		bool suitable = false;
+
+		VkPhysicalDeviceProperties deviceProperties;
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+		suitable = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+			deviceFeatures.geometryShader;
+
+
+		if (suitable) 
+		{
+			_physicalDevice = device;
+			break;
+		}
+	}
+
+	if (_physicalDevice == VK_NULL_HANDLE) {
+		throw std::runtime_error("failed to find a suitable GPU!");
 	}
 }
