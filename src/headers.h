@@ -8,6 +8,7 @@
 #include <vector>
 #include <assert.h>
 #include <cstring>
+#include <optional>
 
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"

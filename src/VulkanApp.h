@@ -14,6 +14,10 @@ public:
 		return inst;
 	}
 
+protected:
+	struct QueueFamilyIndices {
+		std::optional<uint32_t> graphicsFamily;
+	};
 
 
 protected:
@@ -30,6 +34,8 @@ protected:
 
 	void checkExtensions();
 	void pickPhysicalDevice();
+
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 
 	const bool _enableValidationLayers;
