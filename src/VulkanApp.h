@@ -34,6 +34,7 @@ protected:
 
 	void checkExtensions();
 	void pickPhysicalDevice();
+	void createLogicalDevice();
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
@@ -45,6 +46,9 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkQueue _graphicsQueue;
+	VkPhysicalDeviceFeatures _deviceFeatures{};
+	VkDevice _device;
 	VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
 	VkInstance _instance = nullptr;
 
