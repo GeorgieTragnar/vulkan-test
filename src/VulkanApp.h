@@ -16,7 +16,12 @@ public:
 
 protected:
 	struct QueueFamilyIndices {
-		std::optional<uint32_t> graphicsFamily;
+		std::optional<uint32_t> _graphicsFamily;
+		std::optional<uint32_t> _presentFamily;
+
+		bool isComplete() {
+			return _graphicsFamily.has_value() && _presentFamily.has_value();
+		}
 	};
 
 
@@ -46,6 +51,8 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkQueue _presentQueue;
+	VkSurfaceKHR _surface;
 	VkQueue _graphicsQueue;
 	VkPhysicalDeviceFeatures _deviceFeatures{};
 	VkDevice _device;

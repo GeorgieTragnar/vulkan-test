@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <cstring>
 #include <optional>
+#include <set>
 
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"
