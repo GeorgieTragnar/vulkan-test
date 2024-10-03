@@ -270,7 +270,6 @@ void VulkanApp::createLogicalDevice()
 		queueCreateInfo.pQueuePriorities = &queuePriority;
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
-
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());

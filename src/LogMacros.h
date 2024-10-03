@@ -12,6 +12,7 @@
 #include <thread>   // for std::this_thread::get_id
 #include <mutex>
 #include <map>
+#include <format>
 
 // ANSI color codes
 #define RESET         "\033[0m"
@@ -112,53 +113,6 @@ inline int calculateTabSpaces(int currentLength) {
 	return nextTabStop - currentLength;
 }
 
-// Function to deduce the format specifier based on the argument type
-template <typename T>
-std::string deduceFormatSpecifier(const T& arg) {
-    if constexpr (std::is_integral<T>::value && !std::is_same<T, char>::value) {
-        return "%d";  // Use %d for integral types (except char)
-    } else if constexpr (std::is_floating_point<T>::value) {
-        return "%f";  // Use %f for floating-point types
-    } else if constexpr (std::is_same<T, const char*>::value || std::is_same<T, std::string>::value) {
-        return "%s";  // Use %s for strings
-    } else if constexpr (std::is_array<T>::value && std::is_same<std::remove_extent_t<T>, char>::value) {
-        return "%s";  // Treat char arrays (like char[256]) as %s for strings
-    } else if constexpr (std::is_same<T, char>::value) {
-        return "%c";  // Use %c for single characters
-    } else {
-        return "%x";  // For unsupported types
-    }
-}
-// Function that substitutes '{}' with printf-style specifiers based on the arguments
-template <typename... Args>
-std::string substituteFormatSpecifiers(const std::string& formatStr, const Args&... args) {
-    std::ostringstream oss;
-    const char* currentChar = formatStr.c_str();
-    size_t argIndex = 0;
-
-    // Create a tuple from the variadic arguments
-    std::tuple<const Args&...> arguments(args...);
-
-    while (*currentChar) {
-        if (*currentChar == '{' && *(currentChar + 1) == '}') {
-            // Substitute with the appropriate format specifier
-            oss << std::apply(
-                [&argIndex](const auto&... args) {
-                    return std::array<std::string, sizeof...(args)>{
-                        deduceFormatSpecifier(args)...}[argIndex++];
-                },
-                arguments);
-            currentChar += 2;  // Move past the '{}'
-        } else {
-            // Copy the character as-is
-            oss << *currentChar;
-            ++currentChar;
-        }
-    }
-
-    return oss.str();
-}
-
 // Get the current timestamp as a string, with the year as the last two digits
 inline std::string currentDateTime() {
     std::time_t now = std::time(nullptr);
@@ -168,23 +122,9 @@ inline std::string currentDateTime() {
     return std::string(buf);
 }
 
-// Helper function for printf-style formatting
-inline std::string formatString(const char* format, ...) {
-	va_list args;
-	va_start(args, format);
-
-	// First, copy the va_list and calculate the required buffer size
-	va_list args_copy;
-	va_copy(args_copy, args);
-	size_t size = std::vsnprintf(nullptr, 0, format, args_copy) + 1;  // +1 for null terminator
-	va_end(args_copy);
-
-	// Now, format the string with the correct buffer size
-	std::unique_ptr<char[]> buf(new char[size]);
-	std::vsnprintf(buf.get(), size, format, args);
-	va_end(args);
-
-	return std::string(buf.get(), buf.get() + size - 1);  // Exclude null terminator
+template <typename... Args>
+inline std::string formatString(std::string_view format_str, Args&&... args) {
+    return std::vformat(format_str, std::make_format_args(std::forward<Args>(args)...));
 }
 
 // Function to wrap a string into lines of specified length
@@ -210,8 +150,7 @@ inline std::string getThreadId() {
 #define LOG_COLOR(level, color, bgColor, format, ...) \
 	do { \
         if (PrettyLogger::Instance().shouldLog(LOG_GROUP, level)) { \
-            std::string subFormat = substituteFormatSpecifiers(format, ##__VA_ARGS__); \
-            std::string formattedMsg = formatString(subFormat.c_str(), ##__VA_ARGS__); \
+            std::string formattedMsg = formatString(format, ##__VA_ARGS__); \
             std::string fileInfo = getFileName(__FILE__) + ":" + std::to_string(__LINE__); \
             std::string dateTime = currentDateTime(); \
             int metadataLength = 27 + fileInfo.size() + 1;  /* timestamp + " | " + thread_id (max 19 chars) + " | " + log level + " | " */ \
