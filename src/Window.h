@@ -15,6 +15,7 @@ public:
 	bool loopStep();
 
 	const char** getRequiredInstanceExtensions(uint32_t& count);
+	VkResult createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
 protected:
 

@@ -19,6 +19,7 @@ VulkanApp::VulkanApp()
 	createInstance();
 	setupDebugMessenger();
 	checkExtensions();
+	createSurface();
 	pickPhysicalDevice();
 	createLogicalDevice();
 }
@@ -28,6 +29,7 @@ VulkanApp::~VulkanApp()
 	if (_enableValidationLayers) {
 		destroyDebugUtilsMessengerEXT();
 	}
+	vkDestroySurfaceKHR(_instance, _surface, nullptr);
     vkDestroyDevice(_device, nullptr);
 	vkDestroyInstance(_instance, nullptr);
 
@@ -190,6 +192,13 @@ void VulkanApp::checkExtensions()
 
 	for (const auto& extension : extensions) {
 		LOG_INFO("{}", extension.extensionName);
+	}
+}
+
+void VulkanApp::createSurface() {
+	if (Window::Instance().createWindowSurface(_instance, &_surface) != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to create window surface!");
 	}
 }
 

@@ -11,7 +11,6 @@ void MainApp::run()
 {
 	Window::Instance();
 	VulkanApp::Instance();
-	LOG_TRACE("KHGSH");
 	mainLoop();
 	cleanup();
 }

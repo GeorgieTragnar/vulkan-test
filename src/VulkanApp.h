@@ -38,6 +38,7 @@ protected:
 	void destroyDebugUtilsMessengerEXT();
 
 	void checkExtensions();
+	void createSurface();
 	void pickPhysicalDevice();
 	void createLogicalDevice();
 
