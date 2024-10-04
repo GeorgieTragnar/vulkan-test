@@ -11,6 +11,8 @@
 #include <optional>
 #include <set>
 #include <sstream>
+#include <algorithm>
+#include <limits>
 
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"

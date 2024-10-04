@@ -17,6 +17,8 @@ public:
 	const char** getRequiredInstanceExtensions(uint32_t& count);
 	VkResult createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
+	GLFWwindow* get_glfwWindow();
+
 protected:
 
 	Window();

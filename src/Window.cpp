@@ -40,3 +40,8 @@ VkResult Window::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface)
 {
 	return glfwCreateWindowSurface(instance, _glfwWindow, nullptr, surface);
 }
+
+GLFWwindow* Window::get_glfwWindow()
+{
+	return _glfwWindow;
+}

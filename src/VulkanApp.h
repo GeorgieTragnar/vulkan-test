@@ -49,6 +49,11 @@ protected:
 	void createSurface();
 	void pickPhysicalDevice();
 	void createLogicalDevice();
+	void createSwapChain();
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
@@ -65,6 +70,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkSwapchainKHR _swapChain;
 	VkQueue _presentQueue;
 	VkSurfaceKHR _surface;
 	VkQueue _graphicsQueue;
