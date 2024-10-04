@@ -455,6 +455,8 @@ void VulkanApp::createSwapChain()
 
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
+	
+	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) 
 	{
