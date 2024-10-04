@@ -38,6 +38,7 @@ protected:
 	void destroyDebugUtilsMessengerEXT();
 
 	void checkExtensions();
+	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	void createSurface();
 	void pickPhysicalDevice();
 	void createLogicalDevice();
@@ -48,6 +49,10 @@ protected:
 	const bool _enableValidationLayers;
 	const std::vector<const char*> _validationLayers = {
 		"VK_LAYER_KHRONOS_validation"
+	};
+
+	const std::vector<const char*> _deviceExtensions = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
 	VkDebugUtilsMessengerEXT _debugMessenger;

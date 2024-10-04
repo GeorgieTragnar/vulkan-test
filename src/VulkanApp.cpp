@@ -222,7 +222,9 @@ void VulkanApp::pickPhysicalDevice()
 
 		suitable = indices.isComplete();
 
-		if (suitable) 
+		bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+		if (suitable && extensionsSupported) 
 		{
 			_physicalDevice = device;
 			break;
@@ -286,7 +288,9 @@ void VulkanApp::createLogicalDevice()
 	createInfo.queueCreateInfoCount = 1;
 
 	createInfo.pEnabledFeatures = &_deviceFeatures;
-	createInfo.enabledExtensionCount = 0;
+
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(_deviceExtensions.size());
+	createInfo.ppEnabledExtensionNames = _deviceExtensions.data();
 
 	if (_enableValidationLayers) {
 		createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
@@ -302,4 +306,21 @@ void VulkanApp::createLogicalDevice()
 
 	vkGetDeviceQueue(_device, indices._graphicsFamily.value(), 0, &_graphicsQueue);
 	vkGetDeviceQueue(_device, indices._presentFamily.value(), 0, &_presentQueue);
+}
+
+bool VulkanApp::checkDeviceExtensionSupport(VkPhysicalDevice device)
+{
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+	std::set<std::string> requiredExtensions(_deviceExtensions.begin(), _deviceExtensions.end());
+
+	for (const auto& extension : availableExtensions) {
+		requiredExtensions.erase(extension.extensionName);
+	}
+
+	return requiredExtensions.empty();
 }
