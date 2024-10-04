@@ -14,6 +14,11 @@ std::vector<std::string> wrapMessage(const std::string& message, int availableSp
 			// Handle tab (\t) by adding the necessary number of spaces
 			int tabSpaces = calculateTabSpaces(currentLine.size());
 			currentLine += std::string(tabSpaces, ' ');
+		} else if (ch == '\n') {
+			int spaceLeft = availableSpace - currentLine.size();
+			currentLine += std::string(spaceLeft, ' ');
+			lines.push_back(currentLine);
+			currentLine = "";
 		} else if (std::isspace(ch)) {
 			// Add spaces to the line, preserving spaces (but split at availableSpace)
 			if (currentLine.size() + 1 > availableSpace) {
