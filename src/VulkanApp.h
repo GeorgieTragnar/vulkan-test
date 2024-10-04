@@ -24,6 +24,13 @@ protected:
 		}
 	};
 
+	struct SwapChainSupportDetails {
+		VkSurfaceCapabilitiesKHR _capabilities;
+		std::vector<VkSurfaceFormatKHR> _formats;
+		std::vector<VkPresentModeKHR> _presentModes;
+	};
+
+
 
 protected:
 
@@ -44,6 +51,7 @@ protected:
 	void createLogicalDevice();
 
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
 
 	const bool _enableValidationLayers;
