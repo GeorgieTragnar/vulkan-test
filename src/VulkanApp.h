@@ -50,6 +50,7 @@ protected:
 	void pickPhysicalDevice();
 	void createLogicalDevice();
 	void createSwapChain();
+	void createImageViews();
 
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -70,6 +71,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	std::vector<VkImageView> _swapChainImageViews;
 	std::vector<VkImage> _swapChainImages;
 	VkSwapchainKHR _swapChain;
 	VkFormat _swapChainImageFormat;
