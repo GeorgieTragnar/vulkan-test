@@ -39,7 +39,7 @@ cd build_vulkan-test
 cmake ../vulkan-test/ -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
 
 # Compile the project
-make
+make -j28
 
 # Go back to the original directory (optional)
 cd ..
