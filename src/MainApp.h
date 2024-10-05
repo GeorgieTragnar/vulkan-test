@@ -8,11 +8,20 @@
 class MainApp 
 {
 public:
-	void run();
+	static MainApp& Instance()
+	{
+		static MainApp inst;
+		return inst;
+	}
 
-private:
+protected:
+	MainApp();
+	~MainApp();
+
+
+	void run();
 	void mainLoop();
-	void cleanup();
+	void drawFrame();
 
 	
 };

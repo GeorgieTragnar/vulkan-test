@@ -7,23 +7,32 @@
 #endif
 #define LOG_GROUP LOG_GROUP_DEFAULT
 
+MainApp::MainApp()
+{
+	run();
+}
+
+MainApp::~MainApp()
+{
+	LOG_INFO("MainApp cleanup");
+}
+
 void MainApp::run() 
 {
 	Window::Instance();
 	VulkanApp::Instance();
 	mainLoop();
-	cleanup();
 }
 
 void MainApp::mainLoop() 
 {
 	while (Window::Instance().loopStep())
 	{
-
+		drawFrame();
 	}
 }
 
-void MainApp::cleanup() 
+void MainApp::drawFrame()
 {
-	LOG_INFO("MainApp cleanup");
+
 }

@@ -81,7 +81,6 @@ void exceptionHandler() {
 
 int main() 
 {
-	MainApp app;
 
 	// TODO: do a cfg load for log levels
 
@@ -89,7 +88,7 @@ int main()
     PrettyLogger::Instance().setGroupLogLevel(LOG_GROUP_VULKAN, LogLevel::TRACE);
 
 	try {
-		app.run();
+		MainApp::Instance();
 	} catch (const std::exception& e) {
 		exceptionHandler();
 		return EXIT_FAILURE;
