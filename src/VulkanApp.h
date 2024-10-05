@@ -70,7 +70,10 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	std::vector<VkImage> _swapChainImages;
 	VkSwapchainKHR _swapChain;
+	VkFormat _swapChainImageFormat;
+	VkExtent2D _swapChainExtent;
 	VkQueue _presentQueue;
 	VkSurfaceKHR _surface;
 	VkQueue _graphicsQueue;

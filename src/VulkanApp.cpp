@@ -455,11 +455,18 @@ void VulkanApp::createSwapChain()
 
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
-	
+
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) 
 	{
 		throw std::runtime_error("failed to create swap chain!");
 	}
+
+	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr);
+	_swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, _swapChainImages.data());
+
+	_swapChainImageFormat = surfaceFormat.format;
+	_swapChainExtent = extent;
 }
