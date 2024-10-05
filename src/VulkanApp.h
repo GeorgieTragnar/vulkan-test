@@ -51,6 +51,9 @@ protected:
 	void createLogicalDevice();
 	void createSwapChain();
 	void createImageViews();
+	void createGraphicsPipeline();
+
+	VkShaderModule createShaderModule(const std::vector<char>& code);
 
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -71,6 +74,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkPipelineLayout _pipelineLayout;
 	std::vector<VkImageView> _swapChainImageViews;
 	std::vector<VkImage> _swapChainImages;
 	VkSwapchainKHR _swapChain;
