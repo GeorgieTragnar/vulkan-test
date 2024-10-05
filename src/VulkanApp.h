@@ -53,6 +53,7 @@ protected:
 	void createImageViews();
 	void createRenderPass();
 	void createGraphicsPipeline();
+	void createFrameBuffers();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
@@ -75,6 +76,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	std::vector<VkFramebuffer> _swapChainFramebuffers;
 	VkPipeline _graphicsPipeline;
 	VkRenderPass _renderPass;
 	VkPipelineLayout _pipelineLayout;

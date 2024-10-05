@@ -26,15 +26,15 @@ VulkanApp::VulkanApp()
 	createImageViews();
 	createRenderPass();
 	createGraphicsPipeline();
+	createFrameBuffers();
 }
 
 VulkanApp::~VulkanApp()
 {
-	if (_enableValidationLayers) 
+	for (auto framebuffer : _swapChainFramebuffers) 
 	{
-		destroyDebugUtilsMessengerEXT();
+		vkDestroyFramebuffer(_device, framebuffer, nullptr);
 	}
-
 	vkDestroyPipeline(_device, _graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
@@ -44,9 +44,13 @@ VulkanApp::~VulkanApp()
 	}
 	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
 	vkDestroySurfaceKHR(_instance, _surface, nullptr);
-    vkDestroyDevice(_device, nullptr);
-	vkDestroyInstance(_instance, nullptr);
+	vkDestroyDevice(_device, nullptr);
 
+	if (_enableValidationLayers) 
+	{
+		destroyDebugUtilsMessengerEXT();
+	}
+	vkDestroyInstance(_instance, nullptr);
 }
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
@@ -711,4 +715,31 @@ void VulkanApp::createRenderPass()
 	{
 		throw std::runtime_error("failed to create render pass!");
 	}
+}
+
+void VulkanApp::createFrameBuffers()
+{
+	_swapChainFramebuffers.resize(_swapChainImageViews.size());
+
+	for (size_t i = 0; i < _swapChainImageViews.size(); i++) 
+	{
+		VkImageView attachments[] = {
+			_swapChainImageViews[i]
+		};
+
+		VkFramebufferCreateInfo framebufferInfo{};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = _renderPass;
+		framebufferInfo.attachmentCount = 1;
+		framebufferInfo.pAttachments = attachments;
+		framebufferInfo.width = _swapChainExtent.width;
+		framebufferInfo.height = _swapChainExtent.height;
+		framebufferInfo.layers = 1;
+
+		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) 
+		{
+			throw std::runtime_error("failed to create framebuffer!");
+		}
+	}
+
 }
