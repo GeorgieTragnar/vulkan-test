@@ -24,7 +24,7 @@ done
 # Perform a clean build if -c is provided
 if [ $CLEAN_BUILD -eq 1 ]; then
     echo "Performing clean build..."
-    rm -rf build_vulkan-test
+    rm -rf build_vulkan-test/*
 fi
 
 # Create a build directory if it doesn't exist
