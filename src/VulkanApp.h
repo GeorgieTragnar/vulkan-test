@@ -51,6 +51,7 @@ protected:
 	void createLogicalDevice();
 	void createSwapChain();
 	void createImageViews();
+	void createRenderPass();
 	void createGraphicsPipeline();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -74,6 +75,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkRenderPass _renderPass;
 	VkPipelineLayout _pipelineLayout;
 	std::vector<VkImageView> _swapChainImageViews;
 	std::vector<VkImage> _swapChainImages;
