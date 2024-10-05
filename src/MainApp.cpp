@@ -25,5 +25,5 @@ void MainApp::mainLoop()
 
 void MainApp::cleanup() 
 {
-	
+	LOG_INFO("MainApp cleanup");
 }

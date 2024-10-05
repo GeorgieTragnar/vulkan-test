@@ -25,7 +25,7 @@ Window::~Window()
 
 bool Window::loopStep() 
 {
-	if (!glfwWindowShouldClose(_glfwWindow))
+	if (glfwWindowShouldClose(_glfwWindow))
 		return false;
 	glfwPollEvents();
 	return true;
