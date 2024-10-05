@@ -21,7 +21,6 @@ protected:
 
 	void run();
 	void mainLoop();
-	void drawFrame();
 
 	
 };

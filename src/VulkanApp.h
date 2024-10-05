@@ -14,6 +14,9 @@ public:
 		return inst;
 	}
 
+	void drawFrame();
+	void waitIdle();
+
 protected:
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> _graphicsFamily;
@@ -56,6 +59,7 @@ protected:
 	void createFrameBuffers();
 	void createCommandPool();
 	void createCommandBuffer();
+	void createSyncObjects();
 
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
@@ -79,6 +83,10 @@ protected:
 	};
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
+
+	VkSemaphore _imageAvailableSemaphore;
+	VkSemaphore _renderFinishedSemaphore;
+	VkFence _inFlightFence;
 
 	VkCommandBuffer _commandBuffer;
 	VkCommandPool _commandPool;

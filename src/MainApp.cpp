@@ -28,11 +28,8 @@ void MainApp::mainLoop()
 {
 	while (Window::Instance().loopStep())
 	{
-		drawFrame();
+		VulkanApp::Instance().drawFrame();
 	}
-}
 
-void MainApp::drawFrame()
-{
-
+	VulkanApp::Instance().waitIdle();
 }
