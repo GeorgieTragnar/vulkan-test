@@ -54,6 +54,10 @@ protected:
 	void createRenderPass();
 	void createGraphicsPipeline();
 	void createFrameBuffers();
+	void createCommandPool();
+	void createCommandBuffer();
+
+	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
@@ -76,6 +80,8 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkCommandBuffer _commandBuffer;
+	VkCommandPool _commandPool;
 	std::vector<VkFramebuffer> _swapChainFramebuffers;
 	VkPipeline _graphicsPipeline;
 	VkRenderPass _renderPass;
