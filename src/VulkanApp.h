@@ -75,6 +75,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	VkPipeline _graphicsPipeline;
 	VkRenderPass _renderPass;
 	VkPipelineLayout _pipelineLayout;
 	std::vector<VkImageView> _swapChainImageViews;
