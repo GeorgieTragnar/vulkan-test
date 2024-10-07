@@ -33,6 +33,8 @@ protected:
 		std::vector<VkPresentModeKHR> _presentModes;
 	};
 
+	const int MAX_FRAMES_IN_FLIGHT = 2;
+
 
 
 protected:
@@ -58,7 +60,7 @@ protected:
 	void createGraphicsPipeline();
 	void createFrameBuffers();
 	void createCommandPool();
-	void createCommandBuffer();
+	void createCommandBuffers();
 	void createSyncObjects();
 
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
@@ -84,11 +86,13 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
-	VkSemaphore _imageAvailableSemaphore;
-	VkSemaphore _renderFinishedSemaphore;
-	VkFence _inFlightFence;
+	uint32_t _currentFrame;
 
-	VkCommandBuffer _commandBuffer;
+	std::vector<VkSemaphore> _imageAvailableSemaphores;
+	std::vector<VkSemaphore> _renderFinishedSemaphores;
+	std::vector<VkFence> _inFlightFences;
+	
+	std::vector<VkCommandBuffer> _commandBuffers;
 	VkCommandPool _commandPool;
 	std::vector<VkFramebuffer> _swapChainFramebuffers;
 	VkPipeline _graphicsPipeline;
@@ -104,7 +108,7 @@ protected:
 	VkQueue _graphicsQueue;
 	VkPhysicalDeviceFeatures _deviceFeatures{};
 	VkDevice _device;
-	VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
-	VkInstance _instance = nullptr;
+	VkPhysicalDevice _physicalDevice;
+	VkInstance _instance;
 
 };
