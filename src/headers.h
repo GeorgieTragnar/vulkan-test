@@ -3,6 +3,7 @@
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <stdexcept>
 #include <vector>
@@ -16,6 +17,7 @@
 #include <fstream>
 #include <functional>
 #include <atomic>
+#include <array>
 
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"

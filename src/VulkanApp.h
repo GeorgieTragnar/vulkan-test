@@ -37,6 +37,40 @@ protected:
 
 	const int MAX_FRAMES_IN_FLIGHT = 2;
 
+	struct Vertex {
+		glm::vec2 pos;
+		glm::vec3 color;
+
+		static VkVertexInputBindingDescription getBindingDescription() 
+		{
+			VkVertexInputBindingDescription bindingDescription{};
+			
+			bindingDescription.binding = 0;  // Binding index (usually 0)
+			bindingDescription.stride = sizeof(Vertex);  // Size of one vertex
+			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;  // Per-vertex data
+
+			return bindingDescription;
+		}
+
+		static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+			std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+
+			// Position attribute
+			attributeDescriptions[0].binding = 0;
+			attributeDescriptions[0].location = 0;
+			attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;  // vec2 (x, y) as 2 floats
+			attributeDescriptions[0].offset = offsetof(Vertex, pos);  // Offset of pos in Vertex
+
+			// Color attribute
+			attributeDescriptions[1].binding = 0;
+			attributeDescriptions[1].location = 1;
+			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;  // vec3 (r, g, b) as 3 floats
+			attributeDescriptions[1].offset = offsetof(Vertex, color);  // Offset of color in Vertex
+
+			return attributeDescriptions;
+		}
+	};
+
 
 
 protected:
@@ -62,12 +96,15 @@ protected:
 	void createGraphicsPipeline();
 	void createFrameBuffers();
 	void createCommandPool();
+	void createVertexBuffer();
 	void createCommandBuffers();
 	void createSyncObjects();
 
 	void cleanupSwapChain();
 
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
@@ -88,6 +125,12 @@ protected:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
+	const std::vector<Vertex> _vertices = {
+		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+	};
+
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
 	std::atomic<bool> _frameBufferResized;
@@ -97,6 +140,8 @@ protected:
 	std::vector<VkSemaphore> _renderFinishedSemaphores;
 	std::vector<VkFence> _inFlightFences;
 	
+	VkDeviceMemory _vertexBufferMemory;
+	VkBuffer _vertexBuffer;
 	std::vector<VkCommandBuffer> _commandBuffers;
 	VkCommandPool _commandPool;
 	std::vector<VkFramebuffer> _swapChainFramebuffers;
