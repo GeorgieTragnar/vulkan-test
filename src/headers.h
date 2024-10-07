@@ -14,6 +14,8 @@
 #include <algorithm>
 #include <limits>
 #include <fstream>
+#include <functional>
+#include <atomic>
 
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"

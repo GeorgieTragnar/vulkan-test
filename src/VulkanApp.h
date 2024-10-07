@@ -16,6 +16,8 @@ public:
 
 	void drawFrame();
 	void waitIdle();
+	void recreateSwapChain();
+	std::function<void()> getResizedCallback();
 
 protected:
 	struct QueueFamilyIndices {
@@ -63,6 +65,8 @@ protected:
 	void createCommandBuffers();
 	void createSyncObjects();
 
+	void cleanupSwapChain();
+
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -86,6 +90,7 @@ protected:
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
+	std::atomic<bool> _frameBufferResized;
 	uint32_t _currentFrame;
 
 	std::vector<VkSemaphore> _imageAvailableSemaphores;

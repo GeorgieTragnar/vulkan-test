@@ -16,6 +16,7 @@ public:
 
 	const char** getRequiredInstanceExtensions(uint32_t& count);
 	VkResult createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
+	void setFrameBufferResizeCallback(std::function<void(void)> cb);
 
 	GLFWwindow* get_glfwWindow();
 
@@ -26,7 +27,9 @@ protected:
 
 	GLFWwindow* _glfwWindow = nullptr;
 
-	int32_t _glfwWidth = 0;
-	int32_t _glfwHeight = 0;
+	std::function<void(void)> _frameBufferResizeCallback;
+
+	int32_t _glfwWidth;
+	int32_t _glfwHeight;
 
 };

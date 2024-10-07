@@ -15,7 +15,8 @@ VulkanApp::VulkanApp()
 	true
 #endif
 ),
-	_currentFrame(0)
+	_currentFrame(0),
+	_frameBufferResized(false)
 {
 	createInstance();
 	setupDebugMessenger();
@@ -35,6 +36,8 @@ VulkanApp::VulkanApp()
 
 VulkanApp::~VulkanApp()
 {
+	cleanupSwapChain();
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		vkDestroySemaphore(_device, _imageAvailableSemaphores[i], nullptr);
@@ -42,18 +45,9 @@ VulkanApp::~VulkanApp()
 		vkDestroyFence(_device, _inFlightFences[i], nullptr);
 	}
 	vkDestroyCommandPool(_device, _commandPool, nullptr);
-	for (auto framebuffer : _swapChainFramebuffers) 
-	{
-		vkDestroyFramebuffer(_device, framebuffer, nullptr);
-	}
 	vkDestroyPipeline(_device, _graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(_device, _pipelineLayout, nullptr);
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
-	for (auto imageView : _swapChainImageViews) 
-	{
-		vkDestroyImageView(_device, imageView, nullptr);
-	}
-	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
 	vkDestroySurfaceKHR(_instance, _surface, nullptr);
 	vkDestroyDevice(_device, nullptr);
 
@@ -876,10 +870,21 @@ void VulkanApp::createSyncObjects()
 void VulkanApp::drawFrame()
 {
 	vkWaitForFences(_device, 1, &_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
-	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
 
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) 
+	{
+		recreateSwapChain();
+		return;
+	} 
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
+	{
+		throw std::runtime_error("failed to acquire swap chain image!");
+	}
+
+	vkResetFences(_device, 1, &_inFlightFences[_currentFrame]);
 
 	vkResetCommandBuffer(_commandBuffers[_currentFrame], 0);
 	recordCommandBuffer(_commandBuffers[_currentFrame], imageIndex);
@@ -918,10 +923,49 @@ void VulkanApp::drawFrame()
 	presentInfo.pResults = nullptr; // Optional
 
 	_currentFrame = (_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-	vkQueuePresentKHR(_presentQueue, &presentInfo);
+	result = vkQueuePresentKHR(_presentQueue, &presentInfo);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || _frameBufferResized)
+	{
+		_frameBufferResized = false;
+		recreateSwapChain();
+	}
+	else if (result != VK_SUCCESS) 
+	{
+		throw std::runtime_error("failed to present swap chain image!");
+	}
 }
 
 void VulkanApp::waitIdle()
 {
 	vkDeviceWaitIdle(_device);
+}
+
+void VulkanApp::recreateSwapChain() 
+{
+	waitIdle();
+
+	cleanupSwapChain();
+
+	createSwapChain();
+	createImageViews();
+	createFrameBuffers();
+}
+
+void VulkanApp::cleanupSwapChain()
+{
+	for (auto framebuffer : _swapChainFramebuffers) 
+	{
+		vkDestroyFramebuffer(_device, framebuffer, nullptr);
+	}
+	for (auto imageView : _swapChainImageViews) 
+	{
+		vkDestroyImageView(_device, imageView, nullptr);
+	}
+	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
+}
+
+std::function<void()> VulkanApp::getResizedCallback()
+{
+	return [this]{ _frameBufferResized = true; };
 }
