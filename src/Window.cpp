@@ -1,6 +1,6 @@
 
 #include "Window.h"
-
+#include <iostream>
 #ifdef LOG_GROUP
 	#undef LOG_GROUP 
 #endif
@@ -18,15 +18,26 @@ Window::Window()
 	_glfwWidth = 800;
 	_glfwHeight = 600;
 	_glfwWindow = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
-	// Store 'this' in the window's user pointer
+	
 	glfwSetWindowUserPointer(_glfwWindow, this);
 
-	// Set the framebuffer size callback using a non-capturing lambda
 	glfwSetFramebufferSizeCallback(_glfwWindow, [](GLFWwindow* window, int width, int height) {
-		// Retrieve 'this' pointer from the window's user pointer
+		while (width == 0 || height == 0) 
+		{
+			// Just in case resize is called for 0 width or height
+			glfwGetFramebufferSize(window, &width, &height);
+			glfwWaitEvents();
+		}
 		Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-		if (self && self->_frameBufferResizeCallback) {
-			// Invoke the _callback function
+		if (self && self->_frameBufferResizeCallback) 
+		{
+			self->_frameBufferResizeCallback();
+		}
+	});
+	glfwSetWindowIconifyCallback(_glfwWindow, [](GLFWwindow* window, int iconified) {
+		Window* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		if (self && self->_frameBufferResizeCallback) 
+		{
 			self->_frameBufferResizeCallback();
 		}
 	});
