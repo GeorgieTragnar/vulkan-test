@@ -44,7 +44,7 @@ protected:
 		static VkVertexInputBindingDescription getBindingDescription() 
 		{
 			VkVertexInputBindingDescription bindingDescription{};
-			
+
 			bindingDescription.binding = 0;  // Binding index (usually 0)
 			bindingDescription.stride = sizeof(Vertex);  // Size of one vertex
 			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;  // Per-vertex data
@@ -102,6 +102,8 @@ protected:
 
 	void cleanupSwapChain();
 
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -126,7 +128,7 @@ protected:
 	};
 
 	const std::vector<Vertex> _vertices = {
-		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
 		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
 		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 	};
