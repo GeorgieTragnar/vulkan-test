@@ -97,6 +97,7 @@ protected:
 	void createFrameBuffers();
 	void createCommandPool();
 	void createVertexBuffer();
+	void createIndexBuffer();
 	void createCommandBuffers();
 	void createSyncObjects();
 
@@ -128,9 +129,14 @@ protected:
 	};
 
 	const std::vector<Vertex> _vertices = {
-		{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-		{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+	};
+
+	const std::vector<uint16_t> _indices = {
+		0, 1, 2, 2, 3, 0
 	};
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
@@ -142,6 +148,8 @@ protected:
 	std::vector<VkSemaphore> _renderFinishedSemaphores;
 	std::vector<VkFence> _inFlightFences;
 	
+	VkDeviceMemory _indexBufferMemory;
+	VkBuffer _indexBuffer;
 	VkDeviceMemory _vertexBufferMemory;
 	VkBuffer _vertexBuffer;
 	std::vector<VkCommandBuffer> _commandBuffers;

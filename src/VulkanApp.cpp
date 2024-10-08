@@ -31,6 +31,7 @@ VulkanApp::VulkanApp()
 	createFrameBuffers();
 	createCommandPool();
 	createVertexBuffer();
+	createIndexBuffer();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -39,6 +40,8 @@ VulkanApp::~VulkanApp()
 {
 	cleanupSwapChain();
 
+	vkDestroyBuffer(_device, _indexBuffer, nullptr);
+	vkFreeMemory(_device, _indexBufferMemory, nullptr);
 	vkDestroyBuffer(_device, _vertexBuffer, nullptr);
     vkFreeMemory(_device, _vertexBufferMemory, nullptr);
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -840,6 +843,31 @@ void VulkanApp::createVertexBuffer()
 	vkFreeMemory(_device, stagingBufferMemory, nullptr);
 }
 
+void VulkanApp::createIndexBuffer()
+{
+	VkDeviceSize bufferSize = sizeof(_indices[0]) * _indices.size();
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+		stagingBuffer, stagingBufferMemory);
+
+	void* data;
+	vkMapMemory(_device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, _indices.data(), (size_t) bufferSize);
+	vkUnmapMemory(_device, stagingBufferMemory);
+
+	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+		_indexBuffer, _indexBufferMemory);
+
+	copyBuffer(stagingBuffer, _indexBuffer, bufferSize);
+
+	vkDestroyBuffer(_device, stagingBuffer, nullptr);
+	vkFreeMemory(_device, stagingBufferMemory, nullptr);
+}
+
 void VulkanApp::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) 
 {
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -941,6 +969,8 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
 	VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
+	vkCmdBindIndexBuffer(commandBuffer, _indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
@@ -955,9 +985,7 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
 	scissor.extent = _swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	vkCmdDraw(commandBuffer, static_cast<uint32_t>(_vertices.size()), 1, 0, 0);
-
-	// vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(_indices.size()), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffer);
 
