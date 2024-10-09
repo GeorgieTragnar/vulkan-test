@@ -118,7 +118,8 @@ protected:
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	void updateUniformBuffer(uint32_t currentImage);
-
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, 
+		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -160,6 +161,10 @@ protected:
 	std::vector<VkSemaphore>		_renderFinishedSemaphores;
 	std::vector<VkFence>			_inFlightFences;
 	
+	VkImage							_textureImage;
+	VkDeviceMemory					_textureImageMemory;
+	VkBuffer						_stagingBuffer;
+	VkDeviceMemory					_stagingBufferMemory;
 	VkDescriptorPool				_descriptorPool;
 	std::vector<VkDescriptorSet>	_descriptorSets;
 	VkDescriptorSetLayout			_descriptorSetLayout;
