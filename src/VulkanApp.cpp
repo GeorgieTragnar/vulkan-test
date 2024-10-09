@@ -1,6 +1,8 @@
 
 #include "VulkanApp.h"
 
+#include "stb_image.h"
+
 #include "LogMacros.h"
 #ifdef LOG_GROUP
 	#undef LOG_GROUP 
@@ -31,6 +33,7 @@ VulkanApp::VulkanApp()
 	createGraphicsPipeline();
 	createFrameBuffers();
 	createCommandPool();
+	createTextureImage();
 	createVertexBuffer();
 	createIndexBuffer();
 	createUniformBuffers();
@@ -815,6 +818,18 @@ void VulkanApp::createCommandPool()
 	if (vkCreateCommandPool(_device, &poolInfo, nullptr, &_commandPool) != VK_SUCCESS) 
 	{
 		throw std::runtime_error("failed to create command pool!");
+	}
+}
+
+void VulkanApp::createTextureImage()
+{
+	int texWidth, texHeight, texChannels;
+	stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+	if (!pixels) 
+	{
+		throw std::runtime_error("failed to load texture image!");
 	}
 }
 

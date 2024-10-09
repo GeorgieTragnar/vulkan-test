@@ -6,6 +6,9 @@
 
 #include "MainApp.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "LogMacros.h"
 #ifdef LOG_GROUP
 	#undef LOG_GROUP 
