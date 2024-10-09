@@ -72,9 +72,9 @@ protected:
 	};
 
 	struct UniformBufferObject {
-		glm::mat4 model;
-		glm::mat4 view;
-		glm::mat4 proj;
+		alignas(16) glm::mat4 model;
+		alignas(16) glm::mat4 view;
+		alignas(16) glm::mat4 proj;
 	};
 
 
@@ -106,6 +106,8 @@ protected:
 	void createVertexBuffer();
 	void createIndexBuffer();
 	void createUniformBuffers();
+	void createDescriptorPool();
+	void createDescriptorSets();
 	void createCommandBuffers();
 	void createSyncObjects();
 
@@ -157,6 +159,9 @@ protected:
 	std::vector<VkSemaphore>		_renderFinishedSemaphores;
 	std::vector<VkFence>			_inFlightFences;
 	
+	VkDescriptorPool				_descriptorPool;
+	std::vector<VkDescriptorSet>	_descriptorSets;
+	VkDescriptorSetLayout			_descriptorSetLayout;
 	std::vector<VkBuffer>			_uniformBuffers;
 	std::vector<VkDeviceMemory>		_uniformBuffersMemory;
 	std::vector<void*>				_uniformBuffersMapped;
@@ -169,7 +174,6 @@ protected:
 	std::vector<VkFramebuffer>		_swapChainFramebuffers;
 	VkPipeline						_graphicsPipeline;
 	VkRenderPass					_renderPass;
-	VkDescriptorSetLayout			_descriptorSetLayout;
 	VkPipelineLayout				_pipelineLayout;
 	std::vector<VkImageView>		_swapChainImageViews;
 	std::vector<VkImage>			_swapChainImages;
