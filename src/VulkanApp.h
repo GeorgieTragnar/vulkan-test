@@ -104,6 +104,7 @@ protected:
 	void createFrameBuffers();
 	void createCommandPool();
 	void createTextureImage();
+	void createTextureImageView();
 	void createVertexBuffer();
 	void createIndexBuffer();
 	void createUniformBuffers();
@@ -122,6 +123,12 @@ protected:
 		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+	VkImageView createImageView(VkImage image, VkFormat format);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -161,6 +168,7 @@ protected:
 	std::vector<VkSemaphore>		_renderFinishedSemaphores;
 	std::vector<VkFence>			_inFlightFences;
 	
+	VkImageView						_textureImageView;
 	VkImage							_textureImage;
 	VkDeviceMemory					_textureImageMemory;
 	VkBuffer						_stagingBuffer;
