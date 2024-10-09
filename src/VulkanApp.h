@@ -71,6 +71,12 @@ protected:
 		}
 	};
 
+	struct UniformBufferObject {
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
+	};
+
 
 
 protected:
@@ -93,11 +99,13 @@ protected:
 	void createSwapChain();
 	void createImageViews();
 	void createRenderPass();
+	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
 	void createFrameBuffers();
 	void createCommandPool();
 	void createVertexBuffer();
 	void createIndexBuffer();
+	void createUniformBuffers();
 	void createCommandBuffers();
 	void createSyncObjects();
 
@@ -106,6 +114,7 @@ protected:
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	void updateUniformBuffer(uint32_t currentImage);
 
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
@@ -144,31 +153,35 @@ protected:
 	std::atomic<bool> _frameBufferResized;
 	uint32_t _currentFrame;
 
-	std::vector<VkSemaphore> _imageAvailableSemaphores;
-	std::vector<VkSemaphore> _renderFinishedSemaphores;
-	std::vector<VkFence> _inFlightFences;
+	std::vector<VkSemaphore>		_imageAvailableSemaphores;
+	std::vector<VkSemaphore>		_renderFinishedSemaphores;
+	std::vector<VkFence>			_inFlightFences;
 	
-	VkDeviceMemory _indexBufferMemory;
-	VkBuffer _indexBuffer;
-	VkDeviceMemory _vertexBufferMemory;
-	VkBuffer _vertexBuffer;
-	std::vector<VkCommandBuffer> _commandBuffers;
-	VkCommandPool _commandPool;
-	std::vector<VkFramebuffer> _swapChainFramebuffers;
-	VkPipeline _graphicsPipeline;
-	VkRenderPass _renderPass;
-	VkPipelineLayout _pipelineLayout;
-	std::vector<VkImageView> _swapChainImageViews;
-	std::vector<VkImage> _swapChainImages;
-	VkSwapchainKHR _swapChain;
-	VkFormat _swapChainImageFormat;
-	VkExtent2D _swapChainExtent;
-	VkQueue _presentQueue;
-	VkSurfaceKHR _surface;
-	VkQueue _graphicsQueue;
-	VkPhysicalDeviceFeatures _deviceFeatures{};
-	VkDevice _device;
-	VkPhysicalDevice _physicalDevice;
-	VkInstance _instance;
+	std::vector<VkBuffer>			_uniformBuffers;
+	std::vector<VkDeviceMemory>		_uniformBuffersMemory;
+	std::vector<void*>				_uniformBuffersMapped;
+	VkDeviceMemory					_indexBufferMemory;
+	VkBuffer						_indexBuffer;
+	VkDeviceMemory					_vertexBufferMemory;
+	VkBuffer						_vertexBuffer;
+	std::vector<VkCommandBuffer>	_commandBuffers;
+	VkCommandPool					_commandPool;
+	std::vector<VkFramebuffer>		_swapChainFramebuffers;
+	VkPipeline						_graphicsPipeline;
+	VkRenderPass					_renderPass;
+	VkDescriptorSetLayout			_descriptorSetLayout;
+	VkPipelineLayout				_pipelineLayout;
+	std::vector<VkImageView>		_swapChainImageViews;
+	std::vector<VkImage>			_swapChainImages;
+	VkSwapchainKHR					_swapChain;
+	VkFormat						_swapChainImageFormat;
+	VkExtent2D						_swapChainExtent;
+	VkQueue							_presentQueue;
+	VkSurfaceKHR					_surface;
+	VkQueue							_graphicsQueue;
+	VkPhysicalDeviceFeatures		_deviceFeatures{};
+	VkDevice						_device;
+	VkPhysicalDevice				_physicalDevice;
+	VkInstance						_instance;
 
 };
