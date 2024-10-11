@@ -105,6 +105,7 @@ protected:
 	void createCommandPool();
 	void createTextureImage();
 	void createTextureImageView();
+	void createTextureSampler();
 	void createVertexBuffer();
 	void createIndexBuffer();
 	void createUniformBuffers();
@@ -168,6 +169,7 @@ protected:
 	std::vector<VkSemaphore>		_renderFinishedSemaphores;
 	std::vector<VkFence>			_inFlightFences;
 	
+	VkSampler						_textureSampler;
 	VkImageView						_textureImageView;
 	VkImage							_textureImage;
 	VkDeviceMemory					_textureImageMemory;
