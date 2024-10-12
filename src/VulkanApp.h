@@ -115,6 +115,7 @@ protected:
 	void createGraphicsPipeline();
 	void createFrameBuffers();
 	void createCommandPool();
+	void createColorResources();
 	void createDepthResources();
     void loadModel();
 	void createTextureImage();
@@ -142,8 +143,9 @@ protected:
 	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 	void generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels);
-	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format, VkImageTiling tiling, 
-		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkSampleCountFlagBits numSamples, 
+		VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, 
+		VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
@@ -151,6 +153,7 @@ protected:
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+	VkSampleCountFlagBits getMaxUsableSampleCount();
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
@@ -180,6 +183,10 @@ protected:
 	std::vector<VkSemaphore>		_renderFinishedSemaphores;
 	std::vector<VkFence>			_inFlightFences;
 	
+	VkImage							_colorImage;
+	VkDeviceMemory					_colorImageMemory;
+	VkImageView						_colorImageView;
+	VkSampleCountFlagBits 			_msaaSamples;
 	VkImage 						_depthImage;
 	VkDeviceMemory 					_depthImageMemory;
 	VkImageView 					_depthImageView;
