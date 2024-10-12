@@ -887,6 +887,19 @@ VkFormat VulkanApp::findSupportedFormat(const std::vector<VkFormat>& candidates,
 	return VK_FORMAT_UNDEFINED;
 }
 
+namespace std 
+{
+	template<> struct hash<VulkanApp::Vertex> 
+	{
+		size_t operator()(VulkanApp::Vertex const& vertex) const 
+		{
+			return ((hash<glm::vec3>()(vertex.pos) ^
+				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+				(hash<glm::vec2>()(vertex.texCoord) << 1);
+		}
+	};
+}
+
 void VulkanApp::loadModel()
 {
 	tinyobj::attrib_t attrib;
@@ -898,6 +911,8 @@ void VulkanApp::loadModel()
 	{
 		throw std::runtime_error(warn + err);
 	}
+
+	std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
 	for (const auto& shape : shapes) 
 	{
@@ -918,8 +933,13 @@ void VulkanApp::loadModel()
 
 			vertex.color = {1.0f, 1.0f, 1.0f};
 
-			_vertices.push_back(vertex);
-			_indices.push_back(_indices.size());
+			if (uniqueVertices.count(vertex) == 0) 
+			{
+				uniqueVertices[vertex] = static_cast<uint32_t>(_vertices.size());
+				_vertices.push_back(vertex);
+			}
+
+			_indices.push_back(uniqueVertices[vertex]);
 		}
 	}
 }

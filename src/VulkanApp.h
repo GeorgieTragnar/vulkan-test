@@ -43,6 +43,7 @@ protected:
 		glm::vec2 texCoord;
 
 
+
 		static VkVertexInputBindingDescription getBindingDescription() 
 		{
 			VkVertexInputBindingDescription bindingDescription{};
@@ -74,7 +75,13 @@ protected:
 
 			return attributeDescriptions;
 		}
+
+		bool operator==(const Vertex& other) const 
+		{
+			return pos == other.pos && color == other.color && texCoord == other.texCoord;
+		}
 	};
+	friend struct std::hash<Vertex>;
 
 	struct UniformBufferObject {
 		alignas(16) glm::mat4 model;
