@@ -21,7 +21,8 @@ VulkanApp::VulkanApp()
 	_frameBufferResized(false)
 {
 	createInstance();
-	setupDebugMessenger();
+	if (_enableValidationLayers)
+		setupDebugMessenger();
 	checkExtensions();
 	createSurface();
 	pickPhysicalDevice();

@@ -2,18 +2,23 @@
 
 # Function to show usage
 usage() {
-    echo "Usage: $0 [-c]"
+    echo "Usage: $0 [-c] [-r]"
     echo "  -c    Perform a clean build (removes the build directory before building)"
+    echo "  -r    Build in Release mode"
     exit 1
 }
 
 # Parse the command-line options
 CLEAN_BUILD=0
+BUILD_TYPE="Debug"
 
-while getopts "c" opt; do
+while getopts "cr" opt; do
     case ${opt} in
         c )
             CLEAN_BUILD=1
+            ;;
+        r )
+            BUILD_TYPE="Release"
             ;;
         * )
             usage
@@ -35,8 +40,8 @@ cd build_vulkan-test
 ~/repositories/vulkan-sdk/x86_64/bin/glslc ../vulkan-test/shaders/shader.vert -o vert.spv
 ~/repositories/vulkan-sdk/x86_64/bin/glslc ../vulkan-test/shaders/shader.frag -o frag.spv
 
-# Run cmake with the specified GCC and G++ compilers
-cmake ../vulkan-test/ -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+# Run cmake with the specified GCC and G++ compilers and build type
+cmake ../vulkan-test/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
 
 # Compile the project
 make -j28
