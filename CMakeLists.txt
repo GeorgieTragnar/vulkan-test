@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
+
+
+# Setup vcpkg script with CMake (note: should be placed before project() call)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/../vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+
+
 project(VulkanProject)
 
 # Set C++ standard to C++20
@@ -28,10 +34,15 @@ file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 add_executable(VulkanProject ${SRC_FILES})
 
-# Find Vulkan and link it
 find_package(Vulkan REQUIRED)
-target_link_libraries(VulkanProject Vulkan::Vulkan)
-
-# Find GLFW and link it
+find_package(FFMPEG REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-target_link_libraries(VulkanProject glfw)
+
+target_include_directories(VulkanProject PRIVATE ${FFMPEG_INCLUDE_DIRS})
+target_link_directories(VulkanProject PRIVATE ${FFMPEG_LIBRARY_DIRS})
+
+target_link_libraries(VulkanProject PRIVATE
+	Vulkan::Vulkan
+	glfw
+	PRIVATE ${FFMPEG_LIBRARIES}
+)
