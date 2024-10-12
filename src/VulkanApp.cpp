@@ -34,6 +34,7 @@ VulkanApp::VulkanApp()
 	createCommandPool();
 	createDepthResources();
 	createFrameBuffers();
+    loadModel();
 	createTextureImage();
 	createTextureImageView();
 	createTextureSampler();
@@ -886,10 +887,47 @@ VkFormat VulkanApp::findSupportedFormat(const std::vector<VkFormat>& candidates,
 	return VK_FORMAT_UNDEFINED;
 }
 
+void VulkanApp::loadModel()
+{
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string warn, err;
+
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) 
+	{
+		throw std::runtime_error(warn + err);
+	}
+
+	for (const auto& shape : shapes) 
+	{
+		for (const auto& index : shape.mesh.indices) 
+		{
+			Vertex vertex{};
+
+			vertex.pos = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+
+			vertex.texCoord = {
+				attrib.texcoords[2 * index.texcoord_index + 0],
+				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			};
+
+			vertex.color = {1.0f, 1.0f, 1.0f};
+
+			_vertices.push_back(vertex);
+			_indices.push_back(_indices.size());
+		}
+	}
+}
+
 void VulkanApp::createTextureImage()
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) 
@@ -1412,7 +1450,7 @@ void VulkanApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imag
 	VkDeviceSize offsets[] = {0};
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-	vkCmdBindIndexBuffer(commandBuffer, _indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, _indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;

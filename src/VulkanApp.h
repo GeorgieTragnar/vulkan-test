@@ -109,6 +109,7 @@ protected:
 	void createFrameBuffers();
 	void createCommandPool();
 	void createDepthResources();
+    void loadModel();
 	void createTextureImage();
 	void createTextureImageView();
 	void createTextureSampler();
@@ -156,22 +157,11 @@ protected:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
-	const std::vector<Vertex> _vertices = {
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+	const std::string MODEL_PATH = "models/viking_room.obj";
+	const std::string TEXTURE_PATH = "textures/viking_room.png";
 
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-	};
-
-	const std::vector<uint16_t> _indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
+	std::vector<Vertex> _vertices;
+	std::vector<uint32_t> _indices;
 
 	VkDebugUtilsMessengerEXT _debugMessenger;
 
