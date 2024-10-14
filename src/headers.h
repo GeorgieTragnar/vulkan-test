@@ -30,6 +30,7 @@
 #define LOG_GROUP_DEFAULT "LogGroupDefault"
 #define LOG_GROUP_VULKAN "LogGroupVulkan"
 #define LOG_GROUP_GLFW "LogGroupGLFW"
+#define LOG_GROUP_FFMPEG "LogGroupFFMPEG"
 
 
 static std::vector<char> readFile(const std::string& filename) {

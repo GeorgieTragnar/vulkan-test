@@ -828,6 +828,12 @@ void VulkanApp::createRenderPass()
 	}
 }
 
+void VulkanApp::getResolution(int32_t& width, int32_t& height)
+{
+	width = _swapChainExtent.width;
+	height = _swapChainExtent.height;
+}
+
 void VulkanApp::createFrameBuffers()
 {
 	_swapChainFramebuffers.resize(_swapChainImageViews.size());

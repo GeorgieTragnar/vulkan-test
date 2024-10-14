@@ -18,6 +18,7 @@ public:
 	void waitIdle();
 	void recreateSwapChain();
 	std::function<void()> getResizedCallback();
+	void getResolution(int32_t& width, int32_t& height);
 
 protected:
 	struct QueueFamilyIndices {
