@@ -18,7 +18,6 @@
 #include "h264fileparser.hpp"
 #include "opusfileparser.hpp"
 #include "helpers.hpp"
-#include "ArgParser.hpp"
 
 using namespace rtc;
 using namespace std;
@@ -98,52 +97,9 @@ void wsOnMessage(json message, Configuration config, shared_ptr<WebSocket> ws) {
     }
 }
 
-int main(int argc, char **argv) try {
-    bool enableDebugLogs = false;
-    bool printHelp = false;
-    int c = 0;
-    auto parser = ArgParser({{"a", "audio"}, {"b", "video"}, {"d", "ip"}, {"p","port"}}, {{"h", "help"}, {"v", "verbose"}});
-    auto parsingResult = parser.parse(argc, argv, [](string key, string value) {
-        if (key == "audio") {
-            opusSamplesDirectory = value + "/";
-        } else if (key == "video") {
-            h264SamplesDirectory = value + "/";
-        } else if (key == "ip") {
-            ip_address = value;
-        } else if (key == "port") {
-            port = atoi(value.data());
-        } else {
-            cerr << "Invalid option --" << key << " with value " << value << endl;
-            return false;
-        }
-        return true;
-    }, [&enableDebugLogs, &printHelp](string flag){
-        if (flag == "verbose") {
-            enableDebugLogs = true;
-        } else if (flag == "help") {
-            printHelp = true;
-        } else {
-            cerr << "Invalid flag --" << flag << endl;
-            return false;
-        }
-        return true;
-    });
-    if (!parsingResult) {
-        return 1;
-    }
-
-    if (printHelp) {
-        cout << "usage: stream-h264 [-a opus_samples_folder] [-b h264_samples_folder] [-d ip_address] [-p port] [-v] [-h]" << endl
-        << "Arguments:" << endl
-        << "\t -a " << "Directory with opus samples (default: " << defaultOpusSamplesDirectory << ")." << endl
-        << "\t -b " << "Directory with H264 samples (default: " << defaultH264SamplesDirectory << ")." << endl
-        << "\t -d " << "Signaling server IP address (default: " << defaultIPAddress << ")." << endl
-        << "\t -p " << "Signaling server port (default: " << defaultPort << ")." << endl
-        << "\t -v " << "Enable debug logs." << endl
-        << "\t -h " << "Print this help and exit." << endl;
-        return 0;
-    }
-    if (enableDebugLogs) {
+int start_libdatachannel_streamer() try 
+{
+    if (true) {
         InitLogger(LogLevel::Debug);
     }
 

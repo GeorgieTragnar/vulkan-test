@@ -32,20 +32,41 @@ add_custom_target(CreateSymLinks ALL
 # Add the executable
 file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
+# Add the libdatachannel as a subdirectory
+add_subdirectory(${CMAKE_SOURCE_DIR}/libdatachannel)
+
+# Include directories
+include_directories(${CMAKE_SOURCE_DIR}/libdatachannel/src)
+
+
 add_executable(VulkanProject ${SRC_FILES})
 
 find_package(Vulkan REQUIRED)
 find_package(FFMPEG REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-find_package(LibDataChannel CONFIG REQUIRED)
+# find_package(LibDataChannel CONFIG REQUIRED)
+# find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
-
-target_include_directories(VulkanProject PRIVATE ${FFMPEG_INCLUDE_DIRS})
-target_link_directories(VulkanProject PRIVATE ${FFMPEG_LIBRARY_DIRS})
-
+# Link libraries
 target_link_libraries(VulkanProject PRIVATE
-	Vulkan::Vulkan
-	glfw
-	PRIVATE ${FFMPEG_LIBRARIES}
-	PRIVATE LibDataChannel::LibDataChannelStatic
+    Vulkan::Vulkan
+    glfw
+    PRIVATE ${FFMPEG_LIBRARIES}
+	PRIVATE datachannel
+    # PRIVATE Threads::Threads
+    PRIVATE nlohmann_json::nlohmann_json
+    # PRIVATE LibDataChannel::LibDataChannelStatic
 )
+
+
+# target_include_directories(VulkanProject PRIVATE ${FFMPEG_INCLUDE_DIRS})
+# target_link_directories(VulkanProject PRIVATE ${FFMPEG_LIBRARY_DIRS})
+
+# target_link_libraries(VulkanProject PRIVATE
+# 	Vulkan::Vulkan
+# 	glfw
+# 	PRIVATE ${FFMPEG_LIBRARIES}
+# 	PRIVATE LibDataChannel::LibDataChannelStatic
+# 	# PRIVATE LibDataChannel::LibDataChannelShared
+# )
