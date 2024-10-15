@@ -18,6 +18,7 @@
 #include "h264fileparser.hpp"
 #include "opusfileparser.hpp"
 #include "helpers.hpp"
+#include "Streamer.h"
 
 using namespace rtc;
 using namespace std;

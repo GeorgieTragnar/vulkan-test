@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "VulkanApp.h"
 #include "VideoStream.h"
+#include "libdatachannel_streamer/Streamer.h"
 
 class MainApp 
 {

@@ -40,8 +40,10 @@ cd build_vulkan-test
 ~/repositories/vulkan-sdk/x86_64/bin/glslc ../vulkan-test/shaders/shader.vert -o vert.spv
 ~/repositories/vulkan-sdk/x86_64/bin/glslc ../vulkan-test/shaders/shader.frag -o frag.spv
 
-# Run cmake with the specified GCC and G++ compilers and build type
-cmake ../vulkan-test/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+if [ $CLEAN_BUILD -eq 1 ]; then
+    # Run cmake with the specified GCC and G++ compilers and build type
+    cmake ../vulkan-test/ -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+fi
 
 # Compile the project
 make -j28
