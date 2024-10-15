@@ -4,7 +4,7 @@
 #include "headers.h"
 #include "Window.h"
 #include "VulkanApp.h"
-#include "FFMPEGStream.h"
+#include "VideoStream.h"
 
 class MainApp 
 {

@@ -37,6 +37,8 @@ add_executable(VulkanProject ${SRC_FILES})
 find_package(Vulkan REQUIRED)
 find_package(FFMPEG REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+find_package(LibDataChannel CONFIG REQUIRED)
+
 
 target_include_directories(VulkanProject PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_directories(VulkanProject PRIVATE ${FFMPEG_LIBRARY_DIRS})
@@ -45,4 +47,5 @@ target_link_libraries(VulkanProject PRIVATE
 	Vulkan::Vulkan
 	glfw
 	PRIVATE ${FFMPEG_LIBRARIES}
+	PRIVATE LibDataChannel::LibDataChannelStatic
 )
