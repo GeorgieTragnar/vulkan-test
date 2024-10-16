@@ -10,6 +10,8 @@
 #include "fileparser.hpp"
 #include <fstream>
 
+#include "../VideoStream.h"
+
 using namespace std;
 
 FileParser::FileParser(string directory, string extension, uint32_t samplesPerSecond, bool loop) {
@@ -35,22 +37,23 @@ void FileParser::stop() {
 }
 
 void FileParser::loadNextSample() {
-    string frame_id = to_string(++counter);
+    // string frame_id = to_string(++counter);
 
-    string url = directory + "/sample-" + frame_id + extension;
-    ifstream source(url, ios_base::binary);
-    if (!source) {
-        if (loop && counter > 0) {
-            loopTimestampOffset = sampleTime_us;
-            counter = -1;
-            loadNextSample();
-            return;
-        }
-        sample = {};
-        return;
-    }
+    // string url = directory + "/sample-" + frame_id + extension;
+    // ifstream source(url, ios_base::binary);
+    // if (!source) {
+    //     if (loop && counter > 0) {
+    //         loopTimestampOffset = sampleTime_us;
+    //         counter = -1;
+    //         loadNextSample();
+    //         return;
+    //     }
+    //     sample = {};
+    //     return;
+    // }
 
-    vector<char> contents((std::istreambuf_iterator<char>(source)), std::istreambuf_iterator<char>());
+    // vector<char> contents((std::istreambuf_iterator<char>(source)), std::istreambuf_iterator<char>());
+    vector<char> contents(VideoStream::Instance().getNextSample());
     auto *b = reinterpret_cast<const std::byte*>(contents.data());
     sample.assign(b, b + contents.size());
     sampleTime_us += sampleDuration_us;

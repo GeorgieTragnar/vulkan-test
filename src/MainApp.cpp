@@ -22,7 +22,7 @@ void MainApp::run()
 	Window::Instance();
 	VulkanApp::Instance();
 	Window::Instance().setFrameBufferResizeCallback(VulkanApp::Instance().getResizedCallback());
-	// VideoStream::Instance();
+	VideoStream::Instance();
 
 	std::thread([] {start_libdatachannel_streamer();}).detach();
 	

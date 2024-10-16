@@ -1,12 +1,158 @@
 
 
-// #include "VideoStream.h"
+#include "VideoStream.h"
 
-// #include "LogMacros.h"
-// #ifdef LOG_GROUP
-// 	#undef LOG_GROUP 
-// #endif
-// #define LOG_GROUP LOG_GROUP_FFMPEG
+#include "LogMacros.h"
+#ifdef LOG_GROUP
+	#undef LOG_GROUP 
+#endif
+#define LOG_GROUP LOG_GROUP_FFMPEG
+
+
+VideoStream::VideoStream()
+{
+	initFFmpegEncoder();
+}
+
+VideoStream::~VideoStream()
+{
+
+}
+// Initialize FFmpeg encoder for H.264 encoding
+void VideoStream::initFFmpegEncoder() {
+	const AVCodec* codec;
+    {
+
+        const AVCodec* c = nullptr;
+        void* i = nullptr;
+        std::stringstream ss;
+        std::cout << "\n";
+        while ((c = av_codec_iterate(&i))) 
+        {
+            // std::cout << c->name << "\t";
+            if (strcmp(c->name, "h264") == 0)
+            {
+                
+                std::cout << c->name << "\t";
+                break;
+            }
+            // ss << std::string(c->name) << "\t";
+            // LOG_WARNING("Codec: {}", c->name);
+        }
+        codec = c;
+    }
+    // const AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    if (!codec) {
+        throw std::runtime_error("H.264 codec not found");
+    }
+	LOG_CRITICAL("AGSHLKH");
+	// List supported pixel formats
+	if (codec->pix_fmts) {
+		// std::cout << "S" << std::endl;
+		LOG_CRITICAL("Supported pixel formats by the encoder:");
+		for (const enum AVPixelFormat* p = codec->pix_fmts; *p != AV_PIX_FMT_NONE; ++p) {
+			std::cout << " - " << av_get_pix_fmt_name(*p) << std::endl;
+		}
+	}
+	LOG_CRITICAL("AGSHLKH");
+
+
+    codec_ctx = avcodec_alloc_context3(codec);
+    if (!codec_ctx) {
+        throw std::runtime_error("Could not allocate codec context");
+    }
+
+    codec_ctx->bit_rate = 400000; // Set bitrate
+    codec_ctx->width = 1280;      // Frame width
+    codec_ctx->height = 720;      // Frame height
+    codec_ctx->time_base = AVRational{1, 30}; // Frame rate (30 FPS)
+    codec_ctx->framerate = AVRational{30, 1};
+    codec_ctx->gop_size = 10;     // Intra frame interval
+    codec_ctx->max_b_frames = 1;  // Max B-frames
+    codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P; // Pixel format
+
+    // Set encoder options
+    AVDictionary* codec_options = nullptr;
+    av_dict_set(&codec_options, "preset", "ultrafast", 0);
+    av_dict_set(&codec_options, "tune", "zerolatency", 0);
+
+    if (avcodec_open2(codec_ctx, codec, &codec_options) < 0) {
+        av_dict_free(&codec_options);
+        throw std::runtime_error("Could not open codec");
+    }
+    av_dict_free(&codec_options);
+
+    // Allocate the frame
+    frame = av_frame_alloc();
+    if (!frame) {
+        throw std::runtime_error("Could not allocate video frame");
+    }
+    frame->format = codec_ctx->pix_fmt;
+    frame->width = codec_ctx->width;
+    frame->height = codec_ctx->height;
+
+    if (av_frame_get_buffer(frame, 32) < 0) {
+        throw std::runtime_error("Could not allocate frame buffer");
+    }
+
+    // Allocate the packet
+    pkt = av_packet_alloc();
+    if (!pkt) {
+        throw std::runtime_error("Could not allocate AVPacket");
+    }
+}
+
+// Function to encode a raw frame into H.264 and store it in out_sample
+void VideoStream::encodeFrame(std::vector<char>& out_sample) {
+    if (av_frame_make_writable(frame) < 0) {
+        throw std::runtime_error("Could not make frame writable");
+    }
+
+    // Fill the Y, U, and V data planes
+    for (int y = 0; y < codec_ctx->height; y++) {
+        for (int x = 0; x < codec_ctx->width; x++) {
+            frame->data[0][y * frame->linesize[0] + x] = (x + y + frame_counter * 3) % 256; // Y plane
+        }
+    }
+
+    for (int y = 0; y < codec_ctx->height / 2; y++) {
+        for (int x = 0; x < codec_ctx->width / 2; x++) {
+            frame->data[1][y * frame->linesize[1] + x] = (128 + frame_counter * 2) % 256; // U plane
+            frame->data[2][y * frame->linesize[2] + x] = (64 + frame_counter * 5) % 256;  // V plane
+        }
+    }
+
+    frame->pts = frame_counter++; // Set the frame PTS
+
+    // Send the frame to the encoder
+	int ret = avcodec_send_frame(codec_ctx, frame);
+	if (ret < 0) {
+		char errbuf[AV_ERROR_MAX_STRING_SIZE];
+		av_strerror(ret, errbuf, sizeof(errbuf));
+		throw std::runtime_error(std::string("Error sending frame to encoder: ") + errbuf);
+	}
+
+    // Receive the encoded packet
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(codec_ctx, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            break; // Need more input or end of stream
+        } else if (ret < 0) {
+            throw std::runtime_error("Error during encoding");
+        }
+
+        // Append packet data to the output sample vector
+        out_sample.insert(out_sample.end(), pkt->data, pkt->data + pkt->size);
+        av_packet_unref(pkt);
+    }
+}
+
+// The function that returns the next H.264 sample
+std::vector<char> VideoStream::getNextSample() {
+    std::vector<char> sample;
+    encodeFrame(sample);
+    return sample;
+}
 
 
 // // Function to handle the RTP stream from FFmpeg

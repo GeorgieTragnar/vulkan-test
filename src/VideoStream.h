@@ -1,50 +1,58 @@
 
 
-// #pragma once
+#pragma once
 
-// #include "headers.h"
+#include "headers.h"
 
-// #include "VulkanApp.h"
+#include "VulkanApp.h"
 
-// extern "C" {
-// 	#include <libavcodec/avcodec.h>
-// 	#include <libavformat/avformat.h>
-// 	#include <libavutil/avutil.h>
-// 	#include <libavutil/imgutils.h>
-//     #include <libavutil/opt.h>
-// 	#include <libswscale/swscale.h>
-// 	#include <libswresample/swresample.h>
-// }
+extern "C" {
+	#include <libavcodec/avcodec.h>
+	#include <libavformat/avformat.h>
+	#include <libavutil/avutil.h>
+	#include <libavutil/imgutils.h>
+    #include <libavutil/opt.h>
+	#include <libswscale/swscale.h>
+	#include <libswresample/swresample.h>
+}
 
-// #include <sys/socket.h>
-// #include <arpa/inet.h>
-// #include <unistd.h>
-
-
-// #include <rtc/rtc.hpp>
-// #include <thread>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 
+#include <rtc/rtc.hpp>
+#include <thread>
 
-// class VideoStream
-// {
-// public:
-// 	static VideoStream& Instance()
-// 	{
-// 		static VideoStream inst;
-// 		return inst;
-// 	}
+
+
+class VideoStream
+{
+public:
+	static VideoStream& Instance()
+	{
+		static VideoStream inst;
+		return inst;
+	}
 
 // 	void encode_and_send_video();
 // 	void start_ffmpeg_rtp_stream(const std::string& rtp_url);
 // 	void handle_signaling(std::shared_ptr<rtc::PeerConnection> pc);
 // 	void start_rtc_connection();
 
+	void initFFmpegEncoder();
+	void encodeFrame(std::vector<char>& out_sample);
+	std::vector<char> getNextSample();
 
-// protected:
-// 	VideoStream();
-// 	~VideoStream();
-
+protected:
+	VideoStream();
+	~VideoStream();
+// In your class definition (e.g., VideoStream.h)
+// private:
+    int frame_counter = 0;
+	AVCodecContext* codec_ctx;
+	AVPacket* pkt;
+	AVFrame* frame;
 
 // 	// TODO: move network code into its own class
 // 	int32_t _udp_socket;
@@ -55,4 +63,4 @@
 // 	AVStream* _video_stream;
 
 // 	// AVCodec** codec = nullptr;
-// };
+};
